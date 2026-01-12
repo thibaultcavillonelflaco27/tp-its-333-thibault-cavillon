@@ -8,6 +8,11 @@ def salutation():
     return jsonify({"message": "hello world"})
 
 ## EXO2: API POST: renvoyer un nom fourni en parametre - API end point name: "api/utilisateurs"
+@app.route('/api/utilisateurs', methods=['POST'])
+def utilisateurs():
+    data = request.get_json()
+    nom = data.get('nom', 'Inconnu')
+    return jsonify({"message": f"Bonjour {nom}"})
 
 # to be tested with curl: 
 # >> curl -i -X GET http://localhost:5000/api/salutation
