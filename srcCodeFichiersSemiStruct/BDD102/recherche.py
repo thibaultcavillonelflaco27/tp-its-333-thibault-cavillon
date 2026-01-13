@@ -1,7 +1,7 @@
 import json
 import os
 
-chemin = "BDD101/data.json"
+chemin = "BDD102/data.json"
 
 def recuperer_patient_par_id(id_recherche):
 
