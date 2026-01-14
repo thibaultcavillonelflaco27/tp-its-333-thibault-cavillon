@@ -1,3 +1,4 @@
 Flask>=2.0
 Flask-SQLAlchemy>=3.0
 PyJWT>=2.0
+Flasgger>=0.9
