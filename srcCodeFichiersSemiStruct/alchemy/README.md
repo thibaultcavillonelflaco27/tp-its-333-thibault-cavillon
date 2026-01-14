@@ -1,6 +1,19 @@
 # App de gestion des étudiants (SQLAlchemy)
 
-Usage rapide:
+## Installation et exécution
+
+### Méthode 1: Avec Docker (recommandé)
+
+1. Assurez-vous que Docker est installé et démarré.
+
+2. Construisez et lancez l'app :
+```bash
+docker-compose up --build
+```
+
+L'app sera accessible sur `http://localhost:5000`.
+
+### Méthode 2: Installation locale
 
 1. Créez un environnement virtuel et installez les dépendances:
 
@@ -24,10 +37,12 @@ Accédez à la documentation SwaggerUI à l'adresse : `http://127.0.0.1:5000/api
 
 Ou via le lien `/docs` dans l'app.
 
-Structure:
+## Structure du projet
 
 - `run.py` : exécuteur qui initialise la DB et démarre Flask
 - `app/__init__.py` : création de l'app et de `db` (SQLAlchemy)
 - `app/models.py` : modèle `Etudiant` et fonctions d'accès
 - `app/views.py` : routes et logique
 - `app/templates/` : `index.html`, `new.html`, `login.html`
+- `Dockerfile` : configuration Docker
+- `docker-compose.yml` : orchestration Docker

@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  alchemy-api:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./alchemy.db:/app/alchemy.db
+    environment:
+      - FLASK_ENV=development

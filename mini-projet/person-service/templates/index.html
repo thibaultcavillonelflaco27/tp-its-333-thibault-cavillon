@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Santé</title>
+    <style>
+        body { background-color: #f0f0f0; color: black; }
+        h1 { color: blue; }
+    </style>
+</head>
+<body>
+    <div id="loginSection">
+        <h1>Connexion</h1>
+        <form id="loginForm">
+            <label for="username">Utilisateur:</label>
+            <input type="text" id="username" required>
+            <label for="password">Mot de passe:</label>
+            <input type="password" id="password" required>
+            <button type="submit">Se connecter</button>
+        </form>
+        <p id="loginResult"></p>
+    </div>
+
+    <p>Formulaires ci-dessous :</p>
+
+    <div id="mainSection">
+    <h1>Ajouter une Personne</h1>
+    <form id="addPersonForm">
+        <label for="name">Nom:</label>
+        <input type="text" id="name" required>
+        <button type="submit">Ajouter</button>
+    </form>
+    <p id="result"></p>
+
+    <div id="healthSection">
+        <h1>Ajouter des Paramètres de Santé</h1>
+        <form id="addHealthForm">
+            <label for="personIdInput">ID Personne:</label>
+            <input type="number" id="personIdInput" readonly>
+            <label for="weight">Poids (kg):</label>
+            <input type="number" id="weight" required>
+            <label for="height">Taille (cm):</label>
+            <input type="number" id="height" required>
+            <button type="submit">Ajouter</button>
+        </form>
+        <p id="healthResult"></p>
+    </div>
+
+    <h1>Liste des Utilisateurs</h1>
+    <button id="listUsersBtn">Afficher la liste</button>
+    <div id="usersList"></div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch('http://localhost:5002/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    token = data.access_token;
+                    localStorage.setItem('token', token);
+                    alert('Connexion réussie !');
+                } else {
+                    document.getElementById('loginResult').textContent = 'Identifiants invalides';
+                }
+            } catch (err) {
+                document.getElementById('loginResult').textContent = 'Erreur de connexion';
+            }
+        });
+
+        function getHeaders() {
+            return token ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } : { 'Content-Type': 'application/json' };
+        }
+        document.getElementById('addPersonForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            try {
+                const response = await fetch('/persons', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('result').innerHTML = `Personne ajoutée avec ID: ${result.id}`;
+                    document.getElementById('personIdInput').value = result.id;
+                } else {
+                    const error = await response.json();
+                    document.getElementById('result').textContent = 'Erreur: ' + error.error;
+                }
+            } catch (err) {
+                document.getElementById('result').textContent = 'Erreur réseau: ' + err.message;
+            }
+        });
+
+        document.getElementById('addHealthForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const personId = document.getElementById('personIdInput').value;
+            const weight = parseInt(document.getElementById('weight').value);
+            const height = parseInt(document.getElementById('height').value);
+            const healthData = { weight, height };
+            try {
+                const response = await fetch('http://localhost:5002/health/' + personId, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(healthData)
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('healthResult').textContent = 'Paramètres ajoutés: ' + JSON.stringify(result);
+                } else {
+                    const error = await response.json();
+                    document.getElementById('healthResult').textContent = 'Erreur: ' + error.error;
+                }
+            } catch (err) {
+                document.getElementById('healthResult').textContent = 'Erreur réseau: ' + err.message;
+            }
+        });
+
+        document.getElementById('listUsersBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/persons');
+                if (response.ok) {
+                    const persons = await response.json();
+                    let html = '<ul>';
+                    persons.forEach(p => {
+                        html += `<li>ID: ${p.id}, Nom: ${p.name}</li>`;
+                    });
+                    html += '</ul>';
+                    document.getElementById('usersList').innerHTML = html;
+                } else {
+                    document.getElementById('usersList').textContent = 'Erreur lors de la récupération';
+                }
+            } catch (err) {
+                document.getElementById('usersList').textContent = 'Erreur réseau';
+            }
+        });
+    </script>
+</body>
+</html>

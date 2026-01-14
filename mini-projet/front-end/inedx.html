@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Personnes et Santé</title>
+</head>
+<body>
+<h1>Gestion Personnes et Santé</h1>
+
+<h2>Créer une personne</h2>
+<form id="personForm">
+    Nom : <input type="text" id="personName" required>
+    <button type="submit">Ajouter</button>
+</form>
+
+<h3>Liste des personnes</h3>
+<ul id="personList"></ul>
+
+<h2>Paramètres de santé</h2>
+<form id="healthForm">
+    Personne ID : <input type="number" id="healthPersonId" required>
+    Poids : <input type="number" id="weight">
+    Taille : <input type="number" id="height">
+    Fréquence cardiaque : <input type="number" id="hr">
+    Tension : <input type="text" id="bp">
+    <button type="submit">Ajouter / Mettre à jour</button>
+</form>
+
+<h3>Données de santé</h3>
+<pre id="healthData"></pre>
+
+<script>
+    const personServiceURL = "http://localhost:5001/persons";
+    const healthServiceURL = "http://localhost:5002/health";
+
+    async function loadPersons() {
+        const response = await fetch(personServiceURL);
+        const persons = await response.json();
+        const list = document.getElementById("personList");
+        list.innerHTML = "";
+        persons.forEach(p => {
+            const li = document.createElement("li");
+            li.textContent = `ID: ${p.id}, Nom: ${p.name}`;
+            list.appendChild(li);
+        });
+    }
+
+    document.getElementById("personForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("personName").value;
+        await fetch(personServiceURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+        });
+        document.getElementById("personName").value = "";
+        loadPersons();
+    });
+
+    document.getElementById("healthForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const personId = document.getElementById("healthPersonId").value;
+        const weight = document.getElementById("weight").value;
+        const height = document.getElementById("height").value;
+        const hr = document.getElementById("hr").value;
+        const bp = document.getElementById("bp").value;
+
+        await fetch(`${healthServiceURL}/${personId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ weight, height, heart_rate: hr, blood_pressure: bp })
+        });
+
+        const healthResp = await fetch(`${healthServiceURL}/${personId}`);
+        const healthData = await healthResp.json();
+        document.getElementById("healthData").textContent = JSON.stringify(healthData, null, 2);
+    });
+
+    loadPersons();
+</script>
+</body>
+</html>
