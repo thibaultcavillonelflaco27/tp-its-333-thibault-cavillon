@@ -2,22 +2,26 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{% if etudiant %}Modifier{% else %}Nouveau{% endif %} étudiant</title>
+    <title>Ajouter un étudiant</title>
 </head>
 <body>
-<h3>{% if etudiant %}Modifier{% else %}Nouveau{% endif %} étudiant</h3>
 
-<form method="POST">
+<h3>Ajouter un étudiant</h3>
+
+<form method="POST" action="/auth">
     Nom<br>
-    <input type="text" name="nom" value="{{ etudiant[1] if etudiant else '' }}" {% if etudiant %}readonly{% endif %}/><br><br>
+    <input type="text" name="nom" required><br><br>
 
     Adresse<br>
-    <textarea name="addr" rows="3" cols="30">{{ etudiant[2] if etudiant else '' }}</textarea><br><br>
+    <textarea name="addr" rows="3" cols="30"></textarea><br><br>
 
     PINCODE<br>
-    <input type="text" name="pin" value="{{ etudiant[3] if etudiant else '' }}"/><br><br>
+    <input type="text" name="pin"/><br><br>
 
-    <input type="submit" value="Envoyer"/>
+    Mot de passe pour valider l'ajout<br>
+    <input type="password" name="password" required><br><br>
+
+    <input type="submit" value="Ajouter l'étudiant"/>
 </form>
 
 </body>
